@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { STRING, ARRAY, FLOAT } = Sequelize;
+const { STRING, ARRAY, FLOAT, INTEGER } = Sequelize;
 const conn = new Sequelize(process.env.DATABASE_URL || 'postgres://localhost/acme_reservation_db');
 
 const syncAndSeed = async()=> {
@@ -104,10 +104,15 @@ const syncAndSeed = async()=> {
 
 const User = conn.define('user', {
   name: {
-    type: STRING
+    type: STRING,
   }
 });
-const Reservation = conn.define('reservation', {});
+const Reservation = conn.define('reservation', {
+  restaurantId: {
+    type: INTEGER,
+    allowNull: false
+  }
+});
 const Restaurant = conn.define('restaurant', {
   name: {
     type: STRING
@@ -165,7 +170,7 @@ app.post('/api/users/:userId/reservations', async(req, res, next)=> {
     res.status(201).send(await Reservation.create({ userId: req.params.userId, restaurantId: req.body.restaurantId}));
   }
   catch(ex){
-    next(ex);
+    next(ex);                                                                                       
   }
 });
 

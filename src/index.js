@@ -8,6 +8,22 @@ const reservationsList = document.querySelector('#reservations-list')
 let users;
 let restaurants;
 
+restaurantsList.addEventListener('click', async(e)=> {
+    if(e.target.tagName === 'LI'){
+      const restaurantId = e.target.getAttribute('data-id');
+      const userId = window.location.hash.slice(1); 
+      const url = `/api/users/${userId}/reservations`;
+      await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({ restaurantId }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      renderReservations();
+    }
+  });
+
 const bootstrap = async() => {
     const results = await Promise.all([
         fetchUsers(),
@@ -19,8 +35,8 @@ const bootstrap = async() => {
     renderUsers();
     html = restaurants.map(restaurants => {
         return `
-        <li>
-            ${restaurants.name}
+        <li data-id='${restaurants.id}'>
+            ${restaurants.name} ${restaurants.id}
         </li>
        `;
     }).join('')
@@ -30,15 +46,22 @@ const bootstrap = async() => {
 
 const renderReservations = async() => {
     const hash = window.location.hash.slice(1);
-    const reservations = await fetchReservations(hash);
-    const html = reservations.map(reservation =>  {
-        return `
-            <li>
-                ${reservation.id}
-            </li>
-        `
-    }).join('')
-    reservationsList.innerHTML = html
+    if(hash) {
+            const reservations = await fetchReservations(hash);
+            const html = reservations.map(reservation =>  {
+            const restaurant = restaurants.find(restaurant => restaurant.id === reservation.restaurantId)
+            console.log(restaurant)
+            return `
+                <li>
+                    ${restaurant.name}
+                </li>
+            `
+        }).join('')
+        reservationsList.innerHTML = html
+    }
+    else {
+        window.location.hash = users[0].id
+    }
 };
 
 const renderUsers = ()=> {
