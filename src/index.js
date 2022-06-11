@@ -24,6 +24,21 @@ restaurantsList.addEventListener('click', async(e)=> {
     }
   });
 
+reservationsList.addEventListener('click', async(e) => {
+    if(e.target.tagName === 'LI'){
+        const reservationId = e.target.getAttribute('data-id');
+        console.log(reservationId)
+        const url = `/api/reservations/${reservationId}`;
+        await fetch(url, {
+            method: 'DELETE',
+            headers:  {
+                'Content-Type' : 'application/json'
+            }
+        })
+        renderReservations();
+    }
+});
+
 const bootstrap = async() => {
     const results = await Promise.all([
         fetchUsers(),
@@ -50,9 +65,8 @@ const renderReservations = async() => {
             const reservations = await fetchReservations(hash);
             const html = reservations.map(reservation =>  {
             const restaurant = restaurants.find(restaurant => restaurant.id === reservation.restaurantId)
-            console.log(restaurant)
             return `
-                <li>
+                <li data-id=${reservation.id}>
                     ${restaurant.name}
                 </li>
             `

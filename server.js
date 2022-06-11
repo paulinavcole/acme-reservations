@@ -175,6 +175,7 @@ app.post('/api/users/:userId/reservations', async(req, res, next)=> {
 });
 
 app.delete('/api/reservations/:id', async(req, res, next)=> {
+  console.log(req.params.id)
   try {
     const reservation = await Reservation.findByPk(req.params.id);
     await reservation.destroy();
